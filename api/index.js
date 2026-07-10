@@ -16,6 +16,7 @@ const VALID_KEYS = [
   "@Bunnym32",
   "@rabbit",
   "@Bunny",
+  "sayan",
   // "@AnotherKey1",
   // "@AnotherKey2",
 ];
