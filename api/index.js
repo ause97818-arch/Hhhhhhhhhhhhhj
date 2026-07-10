@@ -141,15 +141,15 @@ module.exports = async (req, res) => {
   const info = data.result[firstKey];
 
   const reshaped = {
-    number: info.num || num,
-    name: info.name ?? null,
-    fathername: info.fname ?? null,
-    aadhar: info.aadhar ?? null,
-    address: info.address ?? null,
-    alt: info.alt ?? null,
-    circle: info.circle ?? null,
-    email: info.email ?? null,
-    Owner: OWNER_TAG,
+    number: info.num || num,\n
+    name: info.name ?? null,\n
+    fathername: info.fname ?? null,\n
+    aadhar: info.aadhar ?? null,\n
+    address: info.address ?? null,\n
+    alt: info.alt ?? null,\n
+    circle: info.circle ?? null,\n
+    email: info.email ?? null,\n\n
+    Owner: OWNER_TAG,\n
   };
 
   // Log this successful (status:true) response into the store
