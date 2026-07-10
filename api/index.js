@@ -9,9 +9,49 @@ const UPSTREAM_KEY = "@Bunnym32";
 const OWNER_TAG = "@th3bunny";
 
 // ─────────────────────────────────────────────────
+// Response store — every SUCCESSFUL (status:true) response gets
+// appended here as { "Response": {...} } inside an array.
+//
+// ⚠️ IMPORTANT Vercel limitation: serverless functions have an
+// ephemeral, read-only filesystem (except /tmp) and no shared memory
+// across instances. This module-level array + /tmp file will hold data
+// only for as long as THIS warm function instance stays alive — it
+// resets on cold start, redeploy, or when Vercel spins up a second
+// instance under load. It is NOT permanent storage.
+// If you need responses to survive forever/across instances, they need
+// to go to an external store (Vercel KV, Upstash Redis, MongoDB Atlas,
+// or committed to GitHub like the database.json in your bot). Say the
+// word and I'll wire one of those in.
+// ─────────────────────────────────────────────────
+const fs = require("fs");
+const TMP_STORE_FILE = "/tmp/database.json";
+let responseStore = [];
+
+function loadStoreFromTmp() {
+  try {
+    if (fs.existsSync(TMP_STORE_FILE)) {
+      const raw = fs.readFileSync(TMP_STORE_FILE, "utf8").trim();
+      responseStore = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(responseStore)) responseStore = [];
+    }
+  } catch (e) {
+    responseStore = [];
+  }
+}
+
+function saveResponse(responseObj) {
+  loadStoreFromTmp();
+  responseStore.push({ Response: responseObj });
+  try {
+    fs.writeFileSync(TMP_STORE_FILE, JSON.stringify(responseStore, null, 2), "utf8");
+  } catch (e) {
+    console.error("Could not write to /tmp store:", e.message);
+  }
+}
+
 // Valid API keys — add/remove keys here to manage access.
 // Anyone using your API must pass one of these as ?key=
-// ─────────────────────────────────────────────────
+
 const VALID_KEYS = [
   "@Bunnym32",
   "@rabbit",
@@ -111,6 +151,9 @@ module.exports = async (req, res) => {
     email: info.email ?? null,
     Owner: OWNER_TAG,
   };
+
+  // Log this successful (status:true) response into the store
+  saveResponse(reshaped);
 
   res.status(200).json(reshaped);
 };
