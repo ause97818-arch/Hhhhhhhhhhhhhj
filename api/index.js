@@ -8,9 +8,38 @@ const UPSTREAM_BASE = "https://sbsakib.eu.cc/apis/num_info_v1";
 const UPSTREAM_KEY = "@Bunnym32";
 const OWNER_TAG = "@th3bunny";
 
+// ─────────────────────────────────────────────────
+// Valid API keys — add/remove keys here to manage access.
+// Anyone using your API must pass one of these as ?key=
+// ─────────────────────────────────────────────────
+const VALID_KEYS = [
+  "@Bunnym32",
+  "@rabbit",
+  "@Bunny",
+  // "@AnotherKey1",
+  // "@AnotherKey2",
+];
+
+const NO_KEY_MESSAGE =
+  "Use Api Key , If you Want to Buy New Api key Contact with Developer: @th3bunny | Telegram";
+const INVALID_KEY_MESSAGE =
+  "Use Active Api Key . For Buy New Api Key Contact with Developer: @th3bunny | Telegram";
+
 module.exports = async (req, res) => {
   // CORS (harmless to allow, remove if you don't want it)
   res.setHeader("Access-Control-Allow-Origin", "*");
+
+  const key = (req.query && req.query.key) || "";
+
+  if (!key) {
+    res.status(401).json({ status: false, message: NO_KEY_MESSAGE });
+    return;
+  }
+
+  if (!VALID_KEYS.includes(key)) {
+    res.status(403).json({ status: false, message: INVALID_KEY_MESSAGE });
+    return;
+  }
 
   const num = (req.query && req.query.num) || "";
 
