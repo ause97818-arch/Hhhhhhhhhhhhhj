@@ -43,7 +43,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const num = (req.query && req.query.num) || "";w
+  const num = (req.query && req.query.num) || "";
 
   if (!num || !/^\d{10}$/.test(num)) {
     res.status(400).json({
