@@ -17,6 +17,7 @@ const VALID_KEYS = [
   "@rabbit",
   "@Bunny",
   "sayan",
+  "demo",
   // "@AnotherKey1",
   // "@AnotherKey2",
 ];
@@ -42,7 +43,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const num = (req.query && req.query.num) || "";
+  const num = (req.query && req.query.num) || "";w
 
   if (!num || !/^\d{10}$/.test(num)) {
     res.status(400).json({
