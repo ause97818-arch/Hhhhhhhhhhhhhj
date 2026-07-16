@@ -340,6 +340,7 @@ img,video{display:block;max-width:100%}
   const CLOUD_NAME = 'wdhnno7y';
   const UPLOAD_PRESET = 'linkify_unsigned';
   const RESOURCE_TYPE = 'raw';
+  const SHORT_PREFIX = 'doc';
 
   const dropZone = document.getElementById('dropZone');
   const fileInput = document.getElementById('fileInput');
@@ -379,6 +380,19 @@ img,video{display:block;max-width:100%}
     if (bytes < 1024) return bytes + ' B';
     if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
     return (bytes/(1024*1024)).toFixed(2) + ' MB';
+  }
+
+  // Turns a full Cloudinary delivery URL into our own short link, e.g.
+  // https://res.cloudinary.com/wdhnno7y/video/upload/v123/abc.mp3
+  // -> https://<this-domain>/aud/abc.mp3
+  // vercel.json proxies /aud/*, /img/*, /vid/*, /stk/*, /doc/* straight back to Cloudinary,
+  // so the short link works exactly like the original — it's just shorter.
+  function shortenUrl(secureUrl){
+    const marker = '/upload/';
+    const idx = secureUrl.indexOf(marker);
+    let tail = idx !== -1 ? secureUrl.slice(idx + marker.length) : secureUrl;
+    tail = tail.replace(/^v[0-9]+\//, ''); // drop the /v168xxxxxx/ version segment
+    return window.location.origin + '/' + SHORT_PREFIX + '/' + tail;
   }
 
   function showError(msg){
@@ -446,12 +460,13 @@ img,video{display:block;max-width:100%}
 
   function renderResult(file, data){
     const secureUrl = data.secure_url || data.url;
+    const shortUrl = shortenUrl(secureUrl);
     const ext = (data.format || file.name.split('.').pop() || '—').toUpperCase();
     resultName.textContent = file.name;
     metaFormat.textContent = ext;
     metaSize.textContent = humanSize(file.size);
     metaType.textContent = file.type || 'application/octet-stream';
-    urlOutput.value = secureUrl;
+    urlOutput.value = shortUrl;
 
     if (RESOURCE_TYPE === 'video' && file.type.startsWith('video/')) {
       resultPreview.innerHTML = '<video src="' + secureUrl + '" muted playsinline></video>';
