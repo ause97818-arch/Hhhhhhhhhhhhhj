@@ -7,7 +7,13 @@
     { "source": "/audio", "destination": "/audio.html" },
     { "source": "/sticker", "destination": "/sticker.html" },
     { "source": "/doc", "destination": "/doc.html" },
-    { "source": "/", "destination": "/index.html" }
+    { "source": "/", "destination": "/index.html" },
+
+    { "source": "/img/:path*", "destination": "https://res.cloudinary.com/wdhnno7y/image/upload/:path*" },
+    { "source": "/vid/:path*", "destination": "https://res.cloudinary.com/wdhnno7y/video/upload/:path*" },
+    { "source": "/aud/:path*", "destination": "https://res.cloudinary.com/wdhnno7y/video/upload/:path*" },
+    { "source": "/stk/:path*", "destination": "https://res.cloudinary.com/wdhnno7y/image/upload/:path*" },
+    { "source": "/doc/:path*", "destination": "https://res.cloudinary.com/wdhnno7y/raw/upload/:path*" }
   ],
   "headers": [
     {
