@@ -207,6 +207,58 @@ img,video{display:block;max-width:100%}
 .response-block .tok-str{color:var(--success);font-weight:600}
 .response-block .tok-num{color:#b45309;font-weight:600}
 
+/* ---------- url fetch system card ---------- */
+.fetch-card{border-radius:var(--r-xl);padding:22px;margin-bottom:26px}
+.fetch-input-row{margin:16px 0 12px}
+.fetch-input{
+  width:100%;border-radius:var(--r-md);padding:14px 16px;
+  font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+  font-size:13px;color:var(--text-1);border:none;outline:none;background:transparent;
+}
+.fetch-input::placeholder{color:var(--text-3)}
+.fetch-process-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:14px 16px;border-radius:var(--r-md);
+  background:linear-gradient(135deg,var(--page-accent),var(--page-accent-dark));
+  color:#fff;font-size:13px;font-weight:700;letter-spacing:.4px;
+  box-shadow:0 6px 16px rgba(47,93,255,.35);
+  transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+  margin-bottom:16px;
+}
+.fetch-process-btn:hover{transform:translateY(-1px)}
+.fetch-process-btn:active{transform:translateY(0);box-shadow:0 3px 9px rgba(47,93,255,.3)}
+.fetch-process-btn:disabled{opacity:.7;cursor:default;transform:none}
+.fetch-process-btn .spin{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;display:none;animation:spin 1s linear infinite}
+.fetch-process-btn.loading .spin{display:inline-block}
+
+.fetch-console{
+  border-radius:var(--r-lg);padding:16px 18px;margin-bottom:16px;
+  max-height:220px;overflow-y:auto;display:none;
+}
+.fetch-console pre{
+  font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+  font-size:12px;line-height:1.8;color:var(--text-2);white-space:pre-wrap;word-break:break-all;
+}
+.fetch-console .c-ok{color:var(--success)}
+.fetch-console .c-err{color:var(--danger)}
+.fetch-console .c-accent{color:var(--page-accent-dark);font-weight:700}
+
+.fetch-result{border-radius:var(--r-lg);overflow:hidden}
+.fetch-result:empty{display:none}
+.fetch-result img,.fetch-result video{width:100%;border-radius:var(--r-lg);display:block}
+.fetch-result audio{width:100%;display:block;margin:6px 0}
+.fetch-result .doc-result{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  border-radius:var(--r-lg);padding:18px;
+}
+.fetch-result .doc-result .doc-label{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:700;color:var(--text-2)}
+.fetch-result .doc-result .doc-label svg{width:20px;height:20px;color:var(--page-accent)}
+.fetch-result .doc-result a{
+  font-size:12px;font-weight:700;color:var(--page-accent);
+  padding:9px 16px;border-radius:var(--r-full);letter-spacing:.3px;
+}
+.fetch-result .err-result{padding:16px 18px;border-radius:var(--r-lg);font-size:12.5px;color:var(--danger);font-weight:600}
+
 @media (max-width:640px){
   .wrap{padding:22px 16px 0}
   .code-tabs{flex-wrap:wrap}
@@ -244,6 +296,8 @@ img,video{display:block;max-width:100%}
     <div class="map-footer">
       <div class="live-row"><span class="dot"></span>REAL-TIME TRAFFIC ROUTING</div>
       <div class="server-row" id="serverRow">SERVER : <b>INDIA (SOUTH)</b></div>
+      <div class="server-row">MAP TYPE : <b>SATELLITE</b></div>
+      <div class="server-row">MAP DETAILS : <b>PUBLIC TRANSPORT</b></div>
     </div>
   </div>
 
@@ -314,6 +368,28 @@ data = res.json()
   <span class="tok-key">"url"</span>: <span class="tok-str">"https://cdnfiles.zone.id/img/x.png"</span>
 }</pre>
     </div>
+  </div>
+
+  <div class="fetch-card neu-raised">
+    <div class="ingest-head">
+      <span class="tag">// Url_Fetch_System</span>
+    </div>
+    <p class="ingest-sub">Paste any file URL below and process it — images, video, audio, and documents are detected and previewed automatically.</p>
+
+    <div class="fetch-input-row neu-inset">
+      <input type="text" id="fetchUrlInput" class="fetch-input" placeholder="https://cdnfiles.zone.id/img/x.png" autocomplete="off" spellcheck="false">
+    </div>
+
+    <button class="fetch-process-btn" id="fetchProcessBtn" type="button">
+      <span class="spin"></span>
+      <span class="btn-label">Processing</span>
+    </button>
+
+    <div class="fetch-console neu-inset" id="fetchConsole">
+      <pre id="fetchConsoleText"></pre>
+    </div>
+
+    <div class="fetch-result" id="fetchResult"></div>
   </div>
 
   <p class="footer">CDN FILES · Powered by Dev. BUNNY M.</p>
@@ -524,6 +600,157 @@ data = res.json()
     try { document.execCommand('copy'); cb(); } catch(e){}
     document.body.removeChild(ta);
   }
+})();
+
+(function(){
+  const input = document.getElementById('fetchUrlInput');
+  const btn = document.getElementById('fetchProcessBtn');
+  const btnLabel = btn.querySelector('.btn-label');
+  const consoleBox = document.getElementById('fetchConsole');
+  const consoleText = document.getElementById('fetchConsoleText');
+  const resultBox = document.getElementById('fetchResult');
+
+  function log(text, cls){
+    const line = document.createElement('span');
+    if (cls) line.className = cls;
+    line.textContent = text;
+    consoleText.appendChild(line);
+    consoleText.appendChild(document.createTextNode('\n'));
+    consoleBox.scrollTop = consoleBox.scrollHeight;
+  }
+
+  function clearAll(){
+    consoleText.innerHTML = '';
+    resultBox.innerHTML = '';
+    consoleBox.style.display = 'block';
+  }
+
+  function guessTypeFromUrl(url){
+    let ext = '';
+    try {
+      ext = url.split('?')[0].split('#')[0].split('.').pop().toLowerCase();
+    } catch(e) {}
+    const imgExt = ['png','jpg','jpeg','gif','webp','svg','bmp','avif'];
+    const vidExt = ['mp4','webm','ogg','mov','mkv','m4v'];
+    const audExt = ['mp3','wav','oga','m4a','flac','aac','weba'];
+    if (imgExt.indexOf(ext) !== -1) return 'image';
+    if (vidExt.indexOf(ext) !== -1) return 'video';
+    if (audExt.indexOf(ext) !== -1) return 'audio';
+    return 'document';
+  }
+
+  function docIconSvg(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>';
+  }
+
+  function renderResult(type, url){
+    resultBox.innerHTML = '';
+    if (type === 'image') {
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = 'Fetched image';
+      img.onerror = function(){ renderError('Could not load image from this URL.'); };
+      resultBox.appendChild(img);
+    } else if (type === 'video') {
+      const vid = document.createElement('video');
+      vid.src = url;
+      vid.controls = true;
+      vid.setAttribute('playsinline', '');
+      vid.onerror = function(){ renderError('Could not load video from this URL.'); };
+      resultBox.appendChild(vid);
+    } else if (type === 'audio') {
+      const wrap = document.createElement('div');
+      wrap.className = 'doc-result neu-flat';
+      wrap.style.flexDirection = 'column';
+      wrap.style.alignItems = 'stretch';
+      const aud = document.createElement('audio');
+      aud.src = url;
+      aud.controls = true;
+      aud.onerror = function(){ renderError('Could not load audio from this URL.'); };
+      resultBox.appendChild(aud);
+    } else {
+      const wrap = document.createElement('div');
+      wrap.className = 'doc-result neu-flat';
+      const label = document.createElement('span');
+      label.className = 'doc-label';
+      label.innerHTML = docIconSvg() + '<span>Document detected</span>';
+      const link = document.createElement('a');
+      link.className = 'neu-raised-sm';
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = 'Open document ↗';
+      wrap.appendChild(label);
+      wrap.appendChild(link);
+      resultBox.appendChild(wrap);
+    }
+  }
+
+  function renderError(msg){
+    resultBox.innerHTML = '';
+    const div = document.createElement('div');
+    div.className = 'err-result neu-flat';
+    div.textContent = msg;
+    resultBox.appendChild(div);
+  }
+
+  function setLoading(isLoading){
+    btn.disabled = isLoading;
+    btn.classList.toggle('loading', isLoading);
+    btnLabel.textContent = isLoading ? 'Processing...' : 'Processing';
+  }
+
+  btn.addEventListener('click', function(){
+    const url = (input.value || '').trim();
+    clearAll();
+
+    if (!url) {
+      log('> error: no url provided', 'c-err');
+      return;
+    }
+
+    log('> fetch url: ' + url, 'c-accent');
+    log('> processing...');
+    setLoading(true);
+
+    fetch(url, { method: 'GET' })
+      .then(function(res){
+        log('> status: ' + res.status + ' ' + res.statusText, res.ok ? 'c-ok' : 'c-err');
+        const contentType = (res.headers.get('content-type') || '').toLowerCase();
+        log('> content-type: ' + (contentType || 'unknown'));
+
+        let type;
+        if (contentType.indexOf('image/') === 0) type = 'image';
+        else if (contentType.indexOf('video/') === 0) type = 'video';
+        else if (contentType.indexOf('audio/') === 0) type = 'audio';
+        else if (contentType.indexOf('application/octet-stream') === 0 || !contentType) type = guessTypeFromUrl(url);
+        else type = 'document';
+
+        log('> detected type: ' + type, 'c-ok');
+        log('> rendering preview...');
+        log('> done.', 'c-ok');
+        renderResult(type, url);
+      })
+      .catch(function(err){
+        log('> fetch failed: ' + err.message, 'c-err');
+        log('> falling back to extension-based detection...');
+        const type = guessTypeFromUrl(url);
+        log('> detected type: ' + type, 'c-ok');
+        log('> rendering preview...');
+        log('> done.', 'c-ok');
+        renderResult(type, url);
+      })
+      .finally(function(){
+        setLoading(false);
+      });
+  });
+
+  input.addEventListener('keydown', function(e){
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      btn.click();
+    }
+  });
 })();
 </script>
 </body>
