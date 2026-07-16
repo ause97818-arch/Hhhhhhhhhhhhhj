@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-sA+zWATbFveLLNAOSuNBrZbHodhF9BXn6EtCmvI3Cj0uHOojtFzY7/gxNS+aTz3Fj4gY0mFhPGVCd/6H/ke5Fw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <style>
 :root{
   --bg-1:#eef2f7;
@@ -423,9 +423,14 @@ img,video{display:block;max-width:100%}
   <p class="footer">CDN FILES · Powered by Dev. BUNNY M.</p>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
 (function(){
+  if (typeof L === 'undefined') {
+    const el = document.getElementById('liveMap');
+    if (el) el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9aa5b3;font-size:12.5px;text-align:center;padding:20px">Map failed to load — check your connection and refresh.</div>';
+    return;
+  }
   const HOME_LAT = 12.9716, HOME_LNG = 77.5946; // TH3 BUNNY edge node (IN-South)
 
   const map = L.map('liveMap', {
@@ -467,6 +472,9 @@ img,video{display:block;max-width:100%}
     </div>`;
 
   L.marker([HOME_LAT, HOME_LNG], { icon: pinIcon }).addTo(map).bindPopup(homePopup).openPopup();
+
+  setTimeout(function(){ map.invalidateSize(); }, 250);
+  window.addEventListener('load', function(){ map.invalidateSize(); });
 
   const pulseIcon = L.divIcon({
     className: '',
