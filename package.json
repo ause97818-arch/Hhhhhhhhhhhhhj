@@ -1,9 +1,0 @@
-{
-  "name": "num-info-api",
-  "version": "1.0.0",
-  "description": "Vercel proxy API for number info lookup",
-  "main": "api/index.js",
-  "engines": {
-    "node": ">=18"
-  }
-}
