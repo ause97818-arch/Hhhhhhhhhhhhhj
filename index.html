@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <style>
 :root{
   --bg-1:#eef2f7;
@@ -288,6 +287,17 @@ img,video{display:block;max-width:100%}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 
+.docs-btn-wrap{display:flex;justify-content:center;margin:0 0 26px}
+.docs-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 26px;border-radius:var(--r-full);
+  font-size:14px;font-weight:700;color:var(--page-accent);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.docs-btn:hover{transform:translateY(-2px)}
+.docs-btn:active{box-shadow:inset 4px 4px 9px var(--shadow-d), inset -4px -4px 9px var(--shadow-l)}
+.docs-btn svg{width:18px;height:18px}
+
 .hero{margin-bottom:28px}
 .hero h1{font-size:28px;font-weight:700;letter-spacing:-.5px;margin-bottom:8px}
 .hero p{font-size:14px;color:var(--text-2);max-width:440px;line-height:1.55}
@@ -352,18 +362,11 @@ img,video{display:block;max-width:100%}
     <p>Pick a format below, drop your file in, and walk away with a permanent link. No accounts, no clutter — just clean CDN hosting.</p>
   </div>
 
-  <div class="map-card neu-raised">
-    <div class="map-card-head">
-      <span class="tag">// Global_Edge_Network (Live)</span>
-      <span class="map-live-badge"><span class="dot"></span>Active</span>
-    </div>
-    <div class="map-frame neu-inset">
-      <div id="liveMap"></div>
-    </div>
-    <div class="map-footer">
-      <div class="live-row"><span class="dot"></span>REAL-TIME TRAFFIC ROUTING</div>
-      <div class="server-row" id="serverRow">SERVER : <b>INDIA (SOUTH)</b></div>
-    </div>
+  <div class="docs-btn-wrap">
+    <a class="docs-btn neu-raised" href="/dev">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 2.5h8l5 5v14h-13z"/><path d="M14.5 2.5v5h5"/><path d="M9 13h6M9 16.5h6M9 9.5h1.5"/></svg>
+      <span>View Documentation</span>
+    </a>
   </div>
 
   <div class="grid">
@@ -423,157 +426,5 @@ img,video{display:block;max-width:100%}
   <p class="footer">CDN FILES · Powered by Dev. BUNNY M.</p>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script>
-(function(){
-  if (typeof L === 'undefined') {
-    const el = document.getElementById('liveMap');
-    if (el) el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9aa5b3;font-size:12.5px;text-align:center;padding:20px">Map failed to load — check your connection and refresh.</div>';
-    return;
-  }
-  const HOME_LAT = 12.9716, HOME_LNG = 77.5946; // TH3 BUNNY edge node (IN-South)
-
-  const worldBounds = L.latLngBounds([-85, -180], [85, 180]);
-
-  const map = L.map('liveMap', {
-    zoomControl: true,
-    scrollWheelZoom: true,
-    attributionControl: false,
-    minZoom: 2,
-    maxZoom: 18,
-    worldCopyJump: true,
-    maxBounds: worldBounds,
-    maxBoundsViscosity: 1.0
-  }).setView([HOME_LAT, HOME_LNG], 5);
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    minZoom: 2,
-    maxZoom: 18,
-    subdomains: 'abc',
-    noWrap: false,
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
-
-  L.control.attribution({ position: 'bottomleft', prefix: false })
-    .addAttribution('&copy; OpenStreetMap contributors')
-    .addTo(map);
-
-  const pinIcon = L.divIcon({
-    className: '',
-    html: '<div class="pin-marker"><svg viewBox="0 0 30 38" fill="none"><path d="M15 37S2 22.4 2 14.5C2 7 7.8 1 15 1s13 6 13 13.5C28 22.4 15 37 15 37z" fill="#2f5dff" stroke="#fff" stroke-width="2"/><circle cx="15" cy="14" r="5" fill="#fff"/></svg></div>',
-    iconSize: [30, 38],
-    iconAnchor: [15, 38],
-    popupAnchor: [0, -36]
-  });
-
-  const homePopup = `
-    <div class="map-popup">
-      <div class="popup-title">TH3 BUNNY</div>
-      <div class="popup-sub">
-        <span class="popup-region">IN-South</span>
-        <span class="popup-status"><span class="dot"></span>ACTIVE</span>
-      </div>
-      <div class="popup-row"><span>Latency</span><b>23ms</b></div>
-      <div class="popup-row">
-        <span>Traffic Load</span>
-        <div class="popup-bar"><div class="popup-bar-fill" style="width:56%"></div></div>
-        <b>56%</b>
-      </div>
-    </div>`;
-
-  L.marker([HOME_LAT, HOME_LNG], { icon: pinIcon }).addTo(map).bindPopup(homePopup).openPopup();
-
-  setTimeout(function(){ map.invalidateSize(); }, 250);
-  window.addEventListener('load', function(){ map.invalidateSize(); });
-
-  const pulseIcon = L.divIcon({
-    className: '',
-    html: '<div class="pulse-marker"><span class="ring"></span><span class="core"></span></div>',
-    iconSize: [22, 22],
-    iconAnchor: [11, 11],
-    popupAnchor: [0, -14]
-  });
-
-  let userMarker = null;
-
-  function userPopup(text){
-    return `
-      <div class="map-popup">
-        <div class="popup-title">Your Location</div>
-        <div class="popup-divider" style="height:1px;background:rgba(154,165,179,.25);margin-bottom:10px"></div>
-        <div class="popup-location">${text}</div>
-      </div>`;
-  }
-
-  const locateControl = L.control({ position: 'bottomright' });
-  locateControl.onAdd = function(){
-    const div = L.DomUtil.create('div', 'locate-btn-wrap');
-    div.innerHTML = '<button id="locateBtn" class="locate-btn" type="button" title="Show my location" aria-label="Show my location">' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>';
-    L.DomEvent.disableClickPropagation(div);
-    L.DomEvent.disableScrollPropagation(div);
-    return div;
-  };
-  locateControl.addTo(map);
-
-  function placeUserMarker(lat, lng){
-    if (userMarker) map.removeLayer(userMarker);
-    userMarker = L.marker([lat, lng], { icon: pulseIcon }).addTo(map);
-    userMarker.bindPopup(userPopup('Locating…')).openPopup();
-    map.flyTo([lat, lng], 13, { duration: 1.1 });
-
-    fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=14', {
-      headers: { 'Accept': 'application/json' }
-    }).then(function(res){ return res.json(); }).then(function(data){
-      const a = data.address || {};
-      const place = a.suburb || a.village || a.town || a.city_district || a.city || a.county || '';
-      const state = a.state || a.region || '';
-      const label = [place, state].filter(Boolean).join(', ').toUpperCase() || (data.display_name || 'Unknown location').toUpperCase();
-      userMarker.setPopupContent(userPopup(label));
-      const serverRow = document.getElementById('serverRow');
-      if (serverRow) serverRow.innerHTML = 'SERVER : <b>ROUTING FROM ' + label + '</b>';
-    }).catch(function(){
-      userMarker.setPopupContent(userPopup('LOCATION UNAVAILABLE'));
-    });
-  }
-
-  document.getElementById('locateBtn').addEventListener('click', function(){
-    const btn = this;
-    if (!navigator.geolocation) {
-      alert('Geolocation is not supported on this browser.');
-      return;
-    }
-    btn.classList.add('locating');
-
-    navigator.geolocation.getCurrentPosition(function(pos){
-      btn.classList.remove('locating');
-      placeUserMarker(pos.coords.latitude, pos.coords.longitude);
-    }, function(err){
-      // High-accuracy GPS often times out on weak signal — retry once with
-      // low accuracy (network/cell based) before reporting an error.
-      if (err.code === err.TIMEOUT || err.code === err.POSITION_UNAVAILABLE) {
-        navigator.geolocation.getCurrentPosition(function(pos){
-          btn.classList.remove('locating');
-          placeUserMarker(pos.coords.latitude, pos.coords.longitude);
-        }, function(err2){
-          btn.classList.remove('locating');
-          if (err2.code === err2.PERMISSION_DENIED) {
-            alert('Location permission denied. Enable it in your browser settings to see your position on the map.');
-          } else {
-            alert('Could not get your location right now (weak GPS/network signal). Please try again.');
-          }
-        }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 });
-        return;
-      }
-      btn.classList.remove('locating');
-      if (err.code === err.PERMISSION_DENIED) {
-        alert('Location permission denied. Enable it in your browser settings to see your position on the map.');
-      } else {
-        alert('Could not get your location right now. Please try again.');
-      }
-    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 });
-  });
-})();
-</script>
 </body>
 </html>
