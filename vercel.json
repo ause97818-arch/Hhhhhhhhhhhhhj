@@ -7,6 +7,7 @@
     { "source": "/audio", "destination": "/audio.html" },
     { "source": "/sticker", "destination": "/sticker.html" },
     { "source": "/doc", "destination": "/doc.html" },
+    { "source": "/dev", "destination": "/dev.html" },
     { "source": "/", "destination": "/index.html" },
 
     { "source": "/img/:path*", "destination": "https://res.cloudinary.com/wdhnno7y/image/upload/:path*" },
