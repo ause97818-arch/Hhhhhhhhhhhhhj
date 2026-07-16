@@ -516,6 +516,27 @@ img,video{display:block;max-width:100%}
   };
   locateControl.addTo(map);
 
+  function placeUserMarker(lat, lng){
+    if (userMarker) map.removeLayer(userMarker);
+    userMarker = L.marker([lat, lng], { icon: pulseIcon }).addTo(map);
+    userMarker.bindPopup(userPopup('Locating…')).openPopup();
+    map.flyTo([lat, lng], 13, { duration: 1.1 });
+
+    fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=14', {
+      headers: { 'Accept': 'application/json' }
+    }).then(function(res){ return res.json(); }).then(function(data){
+      const a = data.address || {};
+      const place = a.suburb || a.village || a.town || a.city_district || a.city || a.county || '';
+      const state = a.state || a.region || '';
+      const label = [place, state].filter(Boolean).join(', ').toUpperCase() || (data.display_name || 'Unknown location').toUpperCase();
+      userMarker.setPopupContent(userPopup(label));
+      const serverRow = document.getElementById('serverRow');
+      if (serverRow) serverRow.innerHTML = 'SERVER : <b>ROUTING FROM ' + label + '</b>';
+    }).catch(function(){
+      userMarker.setPopupContent(userPopup('LOCATION UNAVAILABLE'));
+    });
+  }
+
   document.getElementById('locateBtn').addEventListener('click', function(){
     const btn = this;
     if (!navigator.geolocation) {
@@ -523,36 +544,34 @@ img,video{display:block;max-width:100%}
       return;
     }
     btn.classList.add('locating');
-    navigator.geolocation.getCurrentPosition(async function(pos){
+
+    navigator.geolocation.getCurrentPosition(function(pos){
       btn.classList.remove('locating');
-      const lat = pos.coords.latitude, lng = pos.coords.longitude;
-
-      if (userMarker) map.removeLayer(userMarker);
-      userMarker = L.marker([lat, lng], { icon: pulseIcon }).addTo(map);
-      userMarker.bindPopup(userPopup('Locating…')).openPopup();
-      map.flyTo([lat, lng], 13, { duration: 1.1 });
-
-      let label = 'Unknown location';
-      try {
-        const res = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=14', {
-          headers: { 'Accept': 'application/json' }
-        });
-        const data = await res.json();
-        const a = data.address || {};
-        const place = a.suburb || a.village || a.town || a.city_district || a.city || a.county || '';
-        const state = a.state || a.region || '';
-        label = [place, state].filter(Boolean).join(', ').toUpperCase() || (data.display_name || 'Unknown location').toUpperCase();
-      } catch (err) {
-        label = 'LOCATION UNAVAILABLE';
+      placeUserMarker(pos.coords.latitude, pos.coords.longitude);
+    }, function(err){
+      // High-accuracy GPS often times out on weak signal — retry once with
+      // low accuracy (network/cell based) before reporting an error.
+      if (err.code === err.TIMEOUT || err.code === err.POSITION_UNAVAILABLE) {
+        navigator.geolocation.getCurrentPosition(function(pos){
+          btn.classList.remove('locating');
+          placeUserMarker(pos.coords.latitude, pos.coords.longitude);
+        }, function(err2){
+          btn.classList.remove('locating');
+          if (err2.code === err2.PERMISSION_DENIED) {
+            alert('Location permission denied. Enable it in your browser settings to see your position on the map.');
+          } else {
+            alert('Could not get your location right now (weak GPS/network signal). Please try again.');
+          }
+        }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 });
+        return;
       }
-
-      userMarker.setPopupContent(userPopup(label));
-      const serverRow = document.getElementById('serverRow');
-      if (serverRow) serverRow.innerHTML = 'SERVER : <b>ROUTING FROM ' + label + '</b>';
-    }, function(){
       btn.classList.remove('locating');
-      alert('Location permission denied. Enable it in your browser settings to see your position on the map.');
-    }, { enableHighAccuracy: true, timeout: 12000 });
+      if (err.code === err.PERMISSION_DENIED) {
+        alert('Location permission denied. Enable it in your browser settings to see your position on the map.');
+      } else {
+        alert('Could not get your location right now. Please try again.');
+      }
+    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 });
   });
 })();
 </script>
