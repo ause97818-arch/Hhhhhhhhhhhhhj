@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Documentation · CDN FILES</title>
+<meta name="description" content="Live edge network status for CDN FILES.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<style>
+:root{
+  --bg-1:#eef2f7;
+  --bg-2:#e3e9f1;
+  --surface:#edf2f8;
+  --shadow-d:#c3cddb;
+  --shadow-l:#ffffff;
+  --text-1:#1e2733;
+  --text-2:#6b7684;
+  --text-3:#9aa5b3;
+  --accent:#2f5dff;
+  --accent-dark:#1e42d6;
+  --accent-soft:#e8edff;
+  --success:#12b76a;
+  --success-soft:#e6f9ef;
+  --danger:#f04438;
+  --danger-soft:#fdeceb;
+  --r-xl:32px;
+  --r-lg:24px;
+  --r-md:18px;
+  --r-sm:12px;
+  --r-full:999px;
+  --page-accent:var(--accent);
+  --page-accent-dark:var(--accent-dark);
+  --page-accent-soft:var(--accent-soft);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-tap-highlight-color:transparent;scroll-behavior:smooth}
+body{
+  min-height:100vh;
+  font-family:'Inter',-apple-system,sans-serif;
+  background:
+    radial-gradient(1100px 560px at 8% -8%, #f4f8fc 0%, transparent 58%),
+    radial-gradient(900px 480px at 108% 6%, #eaf0ff 0%, transparent 55%),
+    linear-gradient(160deg, var(--bg-1), var(--bg-2));
+  background-attachment:fixed;
+  color:var(--text-1);
+  padding-bottom:120px;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.display{font-family:'Outfit',sans-serif}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;border:none;cursor:pointer;background:none;color:inherit}
+img,video{display:block;max-width:100%}
+.wrap{max-width:960px;margin:0 auto;padding:28px 20px 0}
+
+/* ---------- neumorphism primitives ---------- */
+.neu-raised{
+  background:var(--surface);
+  box-shadow:9px 9px 18px var(--shadow-d), -9px -9px 18px var(--shadow-l);
+}
+.neu-raised-sm{
+  background:var(--surface);
+  box-shadow:5px 5px 11px var(--shadow-d), -5px -5px 11px var(--shadow-l);
+}
+.neu-inset{
+  background:var(--surface);
+  box-shadow:inset 6px 6px 13px var(--shadow-d), inset -6px -6px 13px var(--shadow-l);
+}
+.neu-flat{
+  background:var(--surface);
+  box-shadow:3px 3px 7px var(--shadow-d), -3px -3px 7px var(--shadow-l);
+}
+
+/* ---------- top bar (subpages) ---------- */
+.topbar{display:flex;align-items:center;gap:16px;margin-bottom:22px}
+.back-btn{
+  width:46px;height:46px;min-width:46px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text-2);transition:box-shadow .15s, color .15s, transform .15s;
+}
+.back-btn:hover{color:var(--page-accent);transform:translateX(-2px)}
+.back-btn:active{box-shadow:inset 4px 4px 9px var(--shadow-d), inset -4px -4px 9px var(--shadow-l)}
+.back-btn svg{width:19px;height:19px}
+.header-text h1{font-size:21px;font-weight:600;letter-spacing:-.2px}
+.header-text p{font-size:12.5px;color:var(--text-3);margin-top:2px;letter-spacing:.3px;text-transform:uppercase}
+
+/* ---------- status pill ---------- */
+.status-pill-wrap{display:flex;justify-content:center;margin:6px 0 26px}
+.status-pill{
+  font-size:12.5px;font-weight:700;letter-spacing:.6px;color:var(--page-accent);
+  padding:10px 22px;border-radius:var(--r-full);
+  background:var(--page-accent-soft);
+}
+
+/* ---------- footer ---------- */
+.footer{
+  text-align:center;font-size:11.5px;color:var(--text-3);
+  letter-spacing:.3px;padding:30px 20px 10px;
+}
+
+/* ---------- live map card ---------- */
+.map-card{border-radius:var(--r-xl);padding:20px;margin-bottom:26px}
+.map-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.map-card-head .tag{font-size:11px;color:var(--text-3);letter-spacing:1.4px;text-transform:uppercase;font-weight:700;font-family:'Inter',monospace}
+.map-live-badge{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--success);background:var(--success-soft);padding:7px 13px;border-radius:var(--r-full);letter-spacing:.3px}
+.map-live-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 0 3px var(--success-soft)}
+.map-frame{border-radius:var(--r-lg);overflow:hidden;height:340px;position:relative}
+#liveMap{width:100%;height:100%;background:#e7edf4}
+.map-footer{display:flex;flex-direction:column;gap:7px;margin-top:16px;padding:0 2px}
+.map-footer .live-row{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--success);letter-spacing:.3px}
+.map-footer .live-row .dot{width:7px;height:7px;border-radius:50%;background:var(--success)}
+.map-footer .server-row{font-size:11.5px;color:var(--text-3);letter-spacing:.5px;font-family:'Inter',monospace}
+.map-footer .server-row b{color:var(--text-2);font-weight:600}
+
+/* leaflet control resets to match theme */
+.leaflet-container{font-family:'Inter',sans-serif;background:#e7edf4}
+.leaflet-control-zoom{border:none !important;box-shadow:5px 5px 11px var(--shadow-d), -5px -5px 11px var(--shadow-l) !important;border-radius:var(--r-md) !important;overflow:hidden}
+.leaflet-control-zoom a{background:var(--surface) !important;color:var(--text-2) !important;border:none !important}
+.leaflet-control-zoom a:hover{color:var(--accent) !important}
+.leaflet-popup-content-wrapper{border-radius:var(--r-md) !important;background:var(--surface) !important;box-shadow:8px 8px 16px var(--shadow-d), -8px -8px 16px var(--shadow-l) !important;padding:2px !important}
+.leaflet-popup-content{margin:14px 16px !important;min-width:190px}
+.leaflet-popup-tip{background:var(--surface) !important;box-shadow:3px 3px 6px var(--shadow-d) !important}
+.leaflet-popup-close-button{color:var(--text-3) !important;font-size:18px !important;top:10px !important;right:10px !important}
+
+/* custom popup content */
+.map-popup .popup-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:14.5px;color:var(--text-1);margin-bottom:8px}
+.map-popup .popup-sub{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid rgba(154,165,179,.25)}
+.map-popup .popup-region{font-size:12px;font-weight:700;color:var(--accent)}
+.map-popup .popup-status{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--success);letter-spacing:.4px}
+.map-popup .popup-status .dot{width:6px;height:6px;border-radius:50%;background:var(--success)}
+.map-popup .popup-row{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-2);margin-bottom:6px;gap:10px}
+.map-popup .popup-row:last-child{margin-bottom:0}
+.map-popup .popup-row b{color:var(--text-1);font-weight:700}
+.map-popup .popup-bar{flex:1;height:5px;border-radius:var(--r-full);background:var(--accent-soft);overflow:hidden}
+.map-popup .popup-bar-fill{height:100%;border-radius:var(--r-full);background:linear-gradient(90deg,var(--accent),var(--accent-dark))}
+.map-popup .popup-location{font-size:12.5px;font-weight:700;color:var(--accent);letter-spacing:.3px}
+
+/* markers */
+.pin-marker{position:relative;width:30px;height:38px}
+.pin-marker svg{width:30px;height:38px;filter:drop-shadow(0 3px 5px rgba(30,66,214,.35))}
+.pulse-marker{width:22px;height:22px;position:relative;display:flex;align-items:center;justify-content:center}
+.pulse-marker .core{width:13px;height:13px;border-radius:50%;background:var(--accent);border:3px solid #fff;box-shadow:0 2px 6px rgba(47,93,255,.5);z-index:2}
+.pulse-marker .ring{position:absolute;width:100%;height:100%;border-radius:50%;background:var(--accent);opacity:.45;animation:pulse-ring 1.8s ease-out infinite}
+@keyframes pulse-ring{0%{transform:scale(.5);opacity:.55}100%{transform:scale(2.6);opacity:0}}
+
+/* locate control */
+.locate-btn-wrap{margin:0 10px 10px 0 !important}
+.locate-btn{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--surface);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:5px 5px 11px var(--shadow-d), -5px -5px 11px var(--shadow-l);
+  transition:transform .15s ease, color .15s ease;
+}
+.locate-btn:hover{transform:scale(1.06)}
+.locate-btn:active{box-shadow:inset 3px 3px 7px var(--shadow-d), inset -3px -3px 7px var(--shadow-l)}
+.locate-btn svg{width:18px;height:18px}
+.locate-btn.locating svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media (max-width:640px){
+  .wrap{padding:22px 16px 0}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important}
+}
+:focus-visible{outline:2px solid var(--page-accent);outline-offset:2px;border-radius:8px}
+
+</style>
+</head>
+<body style="--page-accent:#2f5dff;--page-accent-dark:#1e42d6;--page-accent-soft:#e8edff">
+<div class="wrap">
+
+  <div class="topbar">
+    <button class="back-btn neu-raised-sm" onclick="location.href='/'" aria-label="Back to dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="header-text">
+      <h1>Documentation</h1>
+      <p>Linkify · live edge network</p>
+    </div>
+  </div>
+
+  <div class="status-pill-wrap">
+    <div class="status-pill neu-flat">• LIVE NETWORK</div>
+  </div>
+
+  <div class="map-card neu-raised">
+    <div class="map-card-head">
+      <span class="tag">// Global_Edge_Network (Live)</span>
+      <span class="map-live-badge"><span class="dot"></span>Active</span>
+    </div>
+    <div class="map-frame neu-inset">
+      <div id="liveMap"></div>
+    </div>
+    <div class="map-footer">
+      <div class="live-row"><span class="dot"></span>REAL-TIME TRAFFIC ROUTING</div>
+      <div class="server-row" id="serverRow">SERVER : <b>INDIA (SOUTH)</b></div>
+    </div>
+  </div>
+
+  <p class="footer">CDN FILES · Powered by Dev. BUNNY M.</p>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+(function(){
+  if (typeof L === 'undefined') {
+    const el = document.getElementById('liveMap');
+    if (el) el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9aa5b3;font-size:12.5px;text-align:center;padding:20px">Map failed to load — check your connection and refresh.</div>';
+    return;
+  }
+  const HOME_LAT = 12.9716, HOME_LNG = 77.5946; // TH3 BUNNY edge node (IN-South)
+
+  const worldBounds = L.latLngBounds([-85, -180], [85, 180]);
+
+  const map = L.map('liveMap', {
+    zoomControl: true,
+    scrollWheelZoom: true,
+    attributionControl: false,
+    minZoom: 2,
+    maxZoom: 18,
+    worldCopyJump: true,
+    maxBounds: worldBounds,
+    maxBoundsViscosity: 1.0
+  }).setView([HOME_LAT, HOME_LNG], 5);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    minZoom: 2,
+    maxZoom: 18,
+    subdomains: 'abc',
+    noWrap: false,
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  L.control.attribution({ position: 'bottomleft', prefix: false })
+    .addAttribution('&copy; OpenStreetMap contributors')
+    .addTo(map);
+
+  const pinIcon = L.divIcon({
+    className: '',
+    html: '<div class="pin-marker"><svg viewBox="0 0 30 38" fill="none"><path d="M15 37S2 22.4 2 14.5C2 7 7.8 1 15 1s13 6 13 13.5C28 22.4 15 37 15 37z" fill="#2f5dff" stroke="#fff" stroke-width="2"/><circle cx="15" cy="14" r="5" fill="#fff"/></svg></div>',
+    iconSize: [30, 38],
+    iconAnchor: [15, 38],
+    popupAnchor: [0, -36]
+  });
+
+  const homePopup = `
+    <div class="map-popup">
+      <div class="popup-title">TH3 BUNNY</div>
+      <div class="popup-sub">
+        <span class="popup-region">IN-South</span>
+        <span class="popup-status"><span class="dot"></span>ACTIVE</span>
+      </div>
+      <div class="popup-row"><span>Latency</span><b>23ms</b></div>
+      <div class="popup-row">
+        <span>Traffic Load</span>
+        <div class="popup-bar"><div class="popup-bar-fill" style="width:56%"></div></div>
+        <b>56%</b>
+      </div>
+    </div>`;
+
+  L.marker([HOME_LAT, HOME_LNG], { icon: pinIcon }).addTo(map).bindPopup(homePopup).openPopup();
+
+  setTimeout(function(){ map.invalidateSize(); }, 250);
+  window.addEventListener('load', function(){ map.invalidateSize(); });
+
+  const pulseIcon = L.divIcon({
+    className: '',
+    html: '<div class="pulse-marker"><span class="ring"></span><span class="core"></span></div>',
+    iconSize: [22, 22],
+    iconAnchor: [11, 11],
+    popupAnchor: [0, -14]
+  });
+
+  let userMarker = null;
+
+  function userPopup(text){
+    return `
+      <div class="map-popup">
+        <div class="popup-title">Your Location</div>
+        <div class="popup-divider" style="height:1px;background:rgba(154,165,179,.25);margin-bottom:10px"></div>
+        <div class="popup-location">${text}</div>
+      </div>`;
+  }
+
+  const locateControl = L.control({ position: 'bottomright' });
+  locateControl.onAdd = function(){
+    const div = L.DomUtil.create('div', 'locate-btn-wrap');
+    div.innerHTML = '<button id="locateBtn" class="locate-btn" type="button" title="Show my location" aria-label="Show my location">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>';
+    L.DomEvent.disableClickPropagation(div);
+    L.DomEvent.disableScrollPropagation(div);
+    return div;
+  };
+  locateControl.addTo(map);
+
+  function placeUserMarker(lat, lng){
+    if (userMarker) map.removeLayer(userMarker);
+    userMarker = L.marker([lat, lng], { icon: pulseIcon }).addTo(map);
+    userMarker.bindPopup(userPopup('Locating…')).openPopup();
+    map.flyTo([lat, lng], 13, { duration: 1.1 });
+
+    fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=14', {
+      headers: { 'Accept': 'application/json' }
+    }).then(function(res){ return res.json(); }).then(function(data){
+      const a = data.address || {};
+      const place = a.suburb || a.village || a.town || a.city_district || a.city || a.county || '';
+      const state = a.state || a.region || '';
+      const label = [place, state].filter(Boolean).join(', ').toUpperCase() || (data.display_name || 'Unknown location').toUpperCase();
+      userMarker.setPopupContent(userPopup(label));
+      const serverRow = document.getElementById('serverRow');
+      if (serverRow) serverRow.innerHTML = 'SERVER : <b>ROUTING FROM ' + label + '</b>';
+    }).catch(function(){
+      userMarker.setPopupContent(userPopup('LOCATION UNAVAILABLE'));
+    });
+  }
+
+  document.getElementById('locateBtn').addEventListener('click', function(){
+    const btn = this;
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported on this browser.');
+      return;
+    }
+    btn.classList.add('locating');
+
+    navigator.geolocation.getCurrentPosition(function(pos){
+      btn.classList.remove('locating');
+      placeUserMarker(pos.coords.latitude, pos.coords.longitude);
+    }, function(err){
+      // High-accuracy GPS often times out on weak signal — retry once with
+      // low accuracy (network/cell based) before reporting an error.
+      if (err.code === err.TIMEOUT || err.code === err.POSITION_UNAVAILABLE) {
+        navigator.geolocation.getCurrentPosition(function(pos){
+          btn.classList.remove('locating');
+          placeUserMarker(pos.coords.latitude, pos.coords.longitude);
+        }, function(err2){
+          btn.classList.remove('locating');
+          if (err2.code === err2.PERMISSION_DENIED) {
+            alert('Location permission denied. Enable it in your browser settings to see your position on the map.');
+          } else {
+            alert('Could not get your location right now (weak GPS/network signal). Please try again.');
+          }
+        }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 });
+        return;
+      }
+      btn.classList.remove('locating');
+      if (err.code === err.PERMISSION_DENIED) {
+        alert('Location permission denied. Enable it in your browser settings to see your position on the map.');
+      } else {
+        alert('Could not get your location right now. Please try again.');
+      }
+    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 });
+  });
+})();
+</script>
+</body>
+</html>
