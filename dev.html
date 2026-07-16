@@ -209,9 +209,9 @@ img,video{display:block;max-width:100%}
 
 /* ---------- url fetch system card ---------- */
 .fetch-card{border-radius:var(--r-xl);padding:22px;margin-bottom:26px}
-.fetch-input-row{margin:16px 0 12px}
+.fetch-input-row{margin:16px 0 12px;border-radius:var(--r-full)}
 .fetch-input{
-  width:100%;border-radius:var(--r-md);padding:14px 16px;
+  width:100%;border-radius:var(--r-full);padding:14px 22px;
   font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
   font-size:13px;color:var(--text-1);border:none;outline:none;background:transparent;
 }
@@ -308,12 +308,6 @@ img,video{display:block;max-width:100%}
     </div>
     <p class="ingest-sub">Send any image, video, audio, or document as multipart/form-data and get back a permanent CDN URL — no auth, no SDK required.</p>
 
-    <div class="badge-row">
-      <span class="badge limits neu-flat"><span class="dot"></span><b>PAYLOAD LIMIT</b><span>· Img 10MB</span><span>· Vid 100MB</span><span>· Audio 50MB</span><span>· Doc 25MB</span></span>
-      <span class="badge neu-flat"><span class="dot"></span>CORS&nbsp;<b>*</b></span>
-      <span class="badge neu-flat"><span class="dot"></span>Latency&nbsp;<b>&lt; 24ms</b></span>
-    </div>
-
     <div class="code-tabs">
       <button class="code-tab neu-flat active" data-tab="curl" type="button">cURL</button>
       <button class="code-tab neu-flat" data-tab="js" type="button">JavaScript</button>
@@ -368,6 +362,12 @@ data = res.json()
   <span class="tok-key">"url"</span>: <span class="tok-str">"https://cdnfiles.zone.id/img/x.png"</span>
 }</pre>
     </div>
+  </div>
+
+  <div class="badge-row">
+    <span class="badge limits neu-flat"><span class="dot"></span><b>PAYLOAD LIMIT</b><span>· Img 10MB</span><span>· Vid 100MB</span><span>· Audio 50MB</span><span>· Doc 25MB</span></span>
+    <span class="badge neu-flat"><span class="dot"></span>CORS&nbsp;<b>*</b></span>
+    <span class="badge neu-flat"><span class="dot"></span>Latency&nbsp;<b>&lt; 24ms</b></span>
   </div>
 
   <div class="fetch-card neu-raised">
