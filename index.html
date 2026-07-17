@@ -429,22 +429,25 @@ img,video{display:block;max-width:100%}
 
 <style>
 .cdn-ai-fab{
-  position:fixed; right:18px; bottom:22px; width:56px; height:56px;
-  border-radius:50%; background:var(--page-accent,#2f5dff);
+  position:fixed; right:18px; bottom:22px; width:58px; height:58px;
+  border-radius:50%; background:var(--surface);
   display:flex; align-items:center; justify-content:center;
-  box-shadow:0 10px 24px rgba(20,24,32,.28);
-  z-index:99998; border:none; cursor:pointer; color:#fff;
-  transition:transform .15s ease;
+  box-shadow:9px 9px 18px var(--shadow-d), -9px -9px 18px var(--shadow-l);
+  z-index:99998; border:none; cursor:pointer; color:var(--page-accent);
+  transition:box-shadow .15s ease, transform .15s ease;
 }
-.cdn-ai-fab:active{ transform:scale(.92); }
-.cdn-ai-fab svg{ width:26px; height:26px; }
+.cdn-ai-fab:active{
+  box-shadow:inset 5px 5px 11px var(--shadow-d), inset -5px -5px 11px var(--shadow-l);
+  transform:scale(.97);
+}
+.cdn-ai-fab svg{ width:25px; height:25px; }
 
 .cdn-ai-panel{
-  position:fixed; right:16px; bottom:88px;
+  position:fixed; right:16px; bottom:90px;
   width:min(380px, 92vw); height:min(568px, 74vh);
-  background:var(--surface,#edf2f8);
+  background:var(--surface);
   border:1.5px solid #171b22;
-  border-radius:20px;
+  border-radius:var(--r-xl,28px);
   box-shadow:none;
   display:flex; flex-direction:column; overflow:hidden;
   z-index:99999;
@@ -458,48 +461,69 @@ img,video{display:block;max-width:100%}
 
 .cdn-ai-head{
   display:flex; align-items:center; justify-content:space-between;
-  padding:14px 16px; border-bottom:1.5px solid #171b22;
-  background:var(--page-accent,#2f5dff); color:#fff; flex:0 0 auto;
+  padding:16px 18px; flex:0 0 auto; background:var(--surface);
+  border-bottom:1.5px solid #171b22;
 }
-.cdn-ai-head-title{ font-family:'Outfit',sans-serif; font-weight:700; font-size:15px; }
-.cdn-ai-head-sub{ font-size:11.5px; opacity:.85; margin-top:1px; }
+.cdn-ai-head-title{ font-family:'Outfit',sans-serif; font-weight:700; font-size:15px; color:var(--text-1); }
+.cdn-ai-head-sub{ font-size:11.5px; color:var(--page-accent); font-weight:600; margin-top:2px; letter-spacing:.2px; }
 .cdn-ai-close{
-  width:26px; height:26px; border-radius:50%; background:rgba(255,255,255,.18);
-  display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; color:#fff;
+  width:32px; height:32px; border-radius:50%; background:var(--surface);
+  box-shadow:5px 5px 11px var(--shadow-d), -5px -5px 11px var(--shadow-l);
+  display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; color:var(--text-2);
+  transition:box-shadow .15s ease;
 }
+.cdn-ai-close:active{ box-shadow:inset 4px 4px 9px var(--shadow-d), inset -4px -4px 9px var(--shadow-l); }
 .cdn-ai-close svg{ width:14px; height:14px; }
 
 .cdn-ai-body{
-  flex:1 1 auto; overflow-y:auto; padding:16px; position:relative;
+  flex:1 1 auto; overflow-y:auto; padding:18px; position:relative;
   display:flex; flex-direction:column; gap:10px;
 }
 .cdn-ai-placeholder{
   position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  text-align:center; padding:0 34px; color:#8a94a3; font-size:14.5px; line-height:1.5; font-weight:500;
+  text-align:center; padding:0 36px; color:var(--text-3); font-size:14.5px; line-height:1.55; font-weight:600;
   pointer-events:none;
 }
-.cdn-ai-msg{ max-width:82%; padding:9px 13px; border-radius:14px; font-size:13.5px; line-height:1.45; word-wrap:break-word; white-space:pre-wrap; }
-.cdn-ai-msg.user{ align-self:flex-end; background:var(--page-accent,#2f5dff); color:#fff; border-bottom-right-radius:4px; }
-.cdn-ai-msg.bot{ align-self:flex-start; background:#fff; color:#1e2733; border:1px solid #d8dee7; border-bottom-left-radius:4px; }
-.cdn-ai-msg.typing{ display:flex; gap:4px; align-items:center; padding:11px 14px; }
-.cdn-ai-msg.typing span{ width:6px; height:6px; border-radius:50%; background:#9aa5b3; animation:cdnAiBlink 1.1s infinite ease-in-out; }
+.cdn-ai-msg{ max-width:82%; padding:10px 14px; border-radius:16px; font-size:13.5px; line-height:1.45; word-wrap:break-word; white-space:pre-wrap; }
+.cdn-ai-msg.user{
+  align-self:flex-end; color:#fff; border-bottom-right-radius:5px;
+  background:linear-gradient(135deg,var(--page-accent),var(--page-accent-dark));
+  box-shadow:4px 4px 10px var(--shadow-d);
+}
+.cdn-ai-msg.bot{
+  align-self:flex-start; color:var(--text-1); border-bottom-left-radius:5px;
+  background:var(--surface);
+  box-shadow:3px 3px 7px var(--shadow-d), -3px -3px 7px var(--shadow-l);
+}
+.cdn-ai-msg.typing{ display:flex; gap:4px; align-items:center; padding:12px 15px; }
+.cdn-ai-msg.typing span{ width:6px; height:6px; border-radius:50%; background:var(--text-3); animation:cdnAiBlink 1.1s infinite ease-in-out; }
 .cdn-ai-msg.typing span:nth-child(2){ animation-delay:.15s; }
 .cdn-ai-msg.typing span:nth-child(3){ animation-delay:.3s; }
 @keyframes cdnAiBlink{ 0%,80%,100%{ opacity:.3; transform:scale(.8);} 40%{ opacity:1; transform:scale(1);} }
 
 .cdn-ai-inputrow{
   flex:0 0 auto; display:flex; align-items:center; gap:8px;
-  padding:10px; border-top:1.5px solid #171b22; background:var(--surface,#edf2f8);
+  padding:12px; border-top:1.5px solid #171b22; background:var(--surface);
+}
+.cdn-ai-input-wrap{
+  flex:1; border-radius:var(--r-full,999px); padding:4px 4px 4px 16px;
+  display:flex; align-items:center;
+  background:var(--surface);
+  box-shadow:inset 5px 5px 11px var(--shadow-d), inset -5px -5px 11px var(--shadow-l);
 }
 .cdn-ai-input{
-  flex:1; border:1.5px solid #171b22; border-radius:12px; padding:10px 12px;
-  font-size:13.5px; font-family:inherit; background:#fff; color:#1e2733; outline:none;
+  flex:1; border:none; background:none; padding:9px 0;
+  font-size:13.5px; font-family:inherit; color:var(--text-1); outline:none; min-width:0;
 }
 .cdn-ai-send{
-  width:38px; height:38px; border-radius:11px; background:var(--page-accent,#2f5dff);
-  display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; color:#fff; flex:0 0 auto;
+  width:38px; height:38px; border-radius:50%; flex:0 0 auto;
+  display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; color:#fff;
+  background:linear-gradient(135deg,var(--page-accent),var(--page-accent-dark));
+  box-shadow:4px 4px 10px var(--shadow-d);
+  transition:transform .15s ease;
 }
-.cdn-ai-send svg{ width:17px; height:17px; }
+.cdn-ai-send:active{ transform:scale(.94); }
+.cdn-ai-send svg{ width:16px; height:16px; }
 .cdn-ai-send:disabled{ opacity:.5; }
 </style>
 
@@ -511,7 +535,7 @@ img,video{display:block;max-width:100%}
   <div class="cdn-ai-head">
     <div>
       <div class="cdn-ai-head-title">CDN Assistant</div>
-      <div class="cdn-ai-head-sub">Online</div>
+      <div class="cdn-ai-head-sub">● Online</div>
     </div>
     <button class="cdn-ai-close" id="cdnAiClose" aria-label="Close">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -521,7 +545,9 @@ img,video{display:block;max-width:100%}
     <div class="cdn-ai-placeholder" id="cdnAiPlaceholder">I'm am Cdn Assistant, tell me how can I help you</div>
   </div>
   <div class="cdn-ai-inputrow">
-    <input type="text" class="cdn-ai-input" id="cdnAiInput" placeholder="Type a message…" autocomplete="off">
+    <div class="cdn-ai-input-wrap">
+      <input type="text" class="cdn-ai-input" id="cdnAiInput" placeholder="Type a message…" autocomplete="off">
+    </div>
     <button class="cdn-ai-send" id="cdnAiSend" aria-label="Send">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 3 18 9-18 9 4-9-4-9z"/></svg>
     </button>
